@@ -379,16 +379,46 @@
         </button>
       `).join('');
 
-      // טעינת כרטיסי תמונות הזכוכית מתוך התיקייה "סוגי זכוכית"
+      // טעינת כרטיסי תמונות הזכוכית עם מנגנון גיבוי רב-סיומות ונתיבים
       const glassBox = document.getElementById('glassContainer');
-      glassBox.innerHTML = CATALOG_DATA.glasses.map((g, idx) => `
-        <button type="button" onclick="selectGlass(${idx})" class="glass-btn bg-white border ${idx === 0 ? 'ring-2 ring-blue-600 border-blue-600 bg-blue-50/40' : 'border-slate-200'} p-2 rounded-2xl flex flex-col items-center justify-between hover:border-blue-400 active:scale-95 transition shadow-sm group">
-          <div class="w-full h-14 bg-slate-100 rounded-xl mb-1.5 flex items-center justify-center p-0.5 overflow-hidden">
-            <img src="./${encodeURIComponent('סוגי זכוכית')}/${encodeURIComponent(g.name)}.png" alt="${g.name}" class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-200" onerror="this.onerror=null; this.src='./${encodeURIComponent('סוגי זכוכית')}/${encodeURIComponent(g.name)}.jpg';" />
-          </div>
-          <span class="text-[11px] font-bold text-slate-700 truncate w-full text-center">${g.name}</span>
-        </button>
-      `).join('');
+      const folderName = encodeURIComponent("סוגי זכוכית");
+
+      glassBox.innerHTML = CATALOG_DATA.glasses.map((g, idx) => {
+        const baseFileName = encodeURIComponent(g.name);
+        return `
+          <button type="button" onclick="selectGlass(${idx})" class="glass-btn bg-white border ${idx === 0 ? 'ring-2 ring-blue-600 border-blue-600 bg-blue-50/40' : 'border-slate-200'} p-2 rounded-2xl flex flex-col items-center justify-between hover:border-blue-400 active:scale-95 transition shadow-sm group">
+            <div class="w-full h-14 bg-slate-100 rounded-xl mb-1.5 flex items-center justify-center p-0.5 overflow-hidden relative">
+              <img 
+                src="./${folderName}/${baseFileName}.png" 
+                alt="${g.name}" 
+                class="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-200" 
+                onerror="
+                  if (!this.dataset.step) {
+                    this.dataset.step = 'jpg';
+                    this.src = './${folderName}/${baseFileName}.jpg';
+                  } else if (this.dataset.step === 'jpg') {
+                    this.dataset.step = 'jpeg';
+                    this.src = './${folderName}/${baseFileName}.jpeg';
+                  } else if (this.dataset.step === 'jpeg') {
+                    this.dataset.step = 'PNG';
+                    this.src = './${folderName}/${baseFileName}.PNG';
+                  } else if (this.dataset.step === 'PNG') {
+                    this.dataset.step = 'JPG';
+                    this.src = './${folderName}/${baseFileName}.JPG';
+                  } else {
+                    this.style.display = 'none';
+                    this.nextElementSibling.classList.remove('hidden');
+                  }
+                " 
+              />
+              <div class="fallback-glass hidden w-full h-full flex flex-col items-center justify-center bg-slate-200 text-slate-500 rounded-lg p-1 text-center">
+                <span class="text-[10px] font-bold leading-tight">${g.name}</span>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold text-slate-700 truncate w-full text-center">${g.name}</span>
+          </button>
+        `;
+      }).join('');
     }
 
     function onCategoryChange() {
@@ -523,7 +553,6 @@
       calculatePrice();
     }
 
-    // מנוע חישוב המחיר
     function calculatePrice() {
       const modelId = document.getElementById('modelSelect').value;
       const model = CATALOG_DATA.models.find(m => m.id === modelId);
@@ -543,22 +572,17 @@
       }
       document.getElementById('hDisplay').innerText = height + ' ס"מ';
 
-      // 1. עלות זכוכית (מ"ר)
       let areaM2 = isCurrentCorner ? (((width1 + width2) * height) / 10000) : ((width1 * height) / 10000);
       let glassCost = areaM2 * glassCostPerM2;
 
-      // 2. עלות פרזול
       let colorMult = selectedColor ? selectedColor.mult : 1.0;
       let hardwareCost = model.cost * colorMult;
 
-      // 3. עלות כוללת
       let totalCost = hardwareCost + glassCost + nanoCost + cutCost;
 
-      // 4. מחיר מחירון לצרכן (עלות * 2.1 / 0.4)
       let catalogRetailPrice = Math.round(totalCost * (2.1 / 0.4));
       document.getElementById('finalPriceDisplay').innerText = catalogRetailPrice.toLocaleString() + ' ₪';
 
-      // 5. חישוב דמי התקנה למתקין
       let installPrice = 600;
       let installText = "תשלום בסך 600 ₪ ישולם ישירות למתקין במעמד ההתקנה.";
 
