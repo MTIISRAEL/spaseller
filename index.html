@@ -113,11 +113,11 @@
         </div>
       </div>
 
-      <!-- שלב 4: מפרט פרזול, זכוכית ושדרוגים -->
+      <!-- שלב 4: מפרט פרזול וזכוכית -->
       <div id="optionsSection" class="border-t pt-4 space-y-6 opacity-50 pointer-events-none transition-opacity">
         <h3 class="text-sm font-bold text-slate-800">4. מפרט פרזול וזכוכית</h3>
         
-        <!-- בחירת גוון פרזול -->
+        <!-- גוון פרזול -->
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-semibold text-slate-600">גוון פרזול</label>
@@ -126,16 +126,16 @@
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5" id="colorContainer"></div>
         </div>
 
-        <!-- בחירת סוג זכוכית (כרטיסי תמונות מתוך התיקייה "סוגי זכוכית") -->
+        <!-- גלריית סוגי זכוכית 8 מ"מ (כרטיסי תמונות מתוך התיקייה "סוגי זכוכית") -->
         <div>
           <div class="flex justify-between items-center mb-2">
             <label class="block text-xs font-semibold text-slate-600">סוג זכוכית (8 מ"מ)</label>
-            <span id="selectedGlassBadge" class="text-xs font-bold text-blue-600">שקופה</span>
+            <span id="selectedGlassBadge" class="text-xs font-bold text-blue-600">שקופה (בסיס)</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5" id="glassContainer"></div>
         </div>
 
-        <!-- תוספות ושדרוגים נוספים -->
+        <!-- תוספות נוספות: ננו וחיתוכים -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
           <!-- ציפוי ננו -->
           <div>
@@ -176,7 +176,6 @@
             <svg class="w-10 h-10 stroke-current opacity-40" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
-              <path d="M21 15l-5-5L5 21"/>
             </svg>
             <span class="text-xs font-semibold">בחר דגם לצפייה בהנפשה</span>
           </div>
@@ -359,7 +358,7 @@
     };
 
     let selectedColor = null;
-    let selectedGlassIndex = 0; // ברירת מחדל: זכוכית שקופה
+    let selectedGlassIndex = 0;
     let isCurrentCorner = false;
 
     function init() {
@@ -379,7 +378,7 @@
         </button>
       `).join('');
 
-      // טעינת כרטיסי תמונות הזכוכית עם מנגנון גיבוי רב-סיומות ונתיבים
+      // טעינת כרטיסי תמונות הזכוכית מתוך התיקייה "סוגי זכוכית"
       const glassBox = document.getElementById('glassContainer');
       const folderName = encodeURIComponent("סוגי זכוכית");
 
